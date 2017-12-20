@@ -1,39 +1,38 @@
-var express = require("express");
-var router = express.Router();
+var db = require("../models");
 
-var burger = require("../modals/burger.js")
+module.exports = function(app) {
 
-router.get("/", function(req, res) {
 
-    burger.all(function(data) {
-        var hbsObject = {
-            burgers: data
-        };
-        console.log(hbsObject);
-        res.render("index", hbsObject);
+    app.get("/", function(req, res) {
+
+        db.Burger.findAll({}).then(function(dbBurger) {
+
+            res.json(dbBurger);
+        });
     });
-});
 
-router.post("/", function(req, res) {
-    console.log(req.body.burger_name);
-    burger.create([
-            req.body.burger_name
-        ],
-        function(result) {
-            res.status(200).end();
+    app.post("/", function(req, res) {
+
+        db.Burger.create({
+            burger: req.body.text
+        }).then(function(dbBurger) {
+            res.json(dbBurger);
         });
-});
+    });
 
-router.put("/", function(req, res) {
-    console.log(req.body.id);
-    burger.update([
-            req.body.id
-        ],
-        function(result) {
-            res.status(200).end();
+    app.put("/", function(req, res) {
+
+        db.Burger.update({
+            burger: req.body.text,
+            devoured: true
+        }, {
+            where: {
+                id: req.body.id
+            }
+        }).then(function(dbBurger) {
+            res.json(dbBurger);
         });
+    });
 
 
-});
-
-module.exports = router;
+};
